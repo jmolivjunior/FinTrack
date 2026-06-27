@@ -1,6 +1,9 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using FinTrack.API.Models;
+using FinTrack.API.Data;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace FinTrack.API.Controllers
 {
@@ -8,31 +11,45 @@ namespace FinTrack.API.Controllers
     [Route("api/[controller]")]
     public class TransactionController : ControllerBase
     {
-        private static List<Transaction> transactions = new List<Transaction>();
+        private readonly AppDbContext _context;
+
+        public TransactionController(AppDbContext context)
+
+        {
+            _context = context;
+        }
+
 
         [HttpGet]
-        public ActionResult<List<Transaction>> GetAll()
+        public async Task<ActionResult<List<Transaction>>> GetAll()
         {
-            return Ok(transactions);
+            return Ok(await _context.Transactions.ToListAsync());
+
         }
 
         [HttpPost]
-        public ActionResult<Transaction> Create(Transaction transaction)
+        public async Task<ActionResult<Transaction>> Create(Transaction transaction)
         {
-            transaction.Id = transactions.Count + 1;
             transaction.Date = DateTime.Now;
-            transactions.Add(transaction);
+            _context.Transactions.Add(transaction);
+            await _context.SaveChangesAsync();
             return Ok(transaction);
-        }
 
+        }
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var transaction = transactions.FirstOrDefault(t => t.Id == id);
-            if (transaction == null) 
-            return NotFound();
-            transactions.Remove(transaction);
+            var transaction = await _context.Transactions.FindAsync(id);
+            if (transaction == null)
+                return NotFound();
+            _context.Transactions.Remove(transaction);
+            await _context.SaveChangesAsync();
             return Ok();
         }
+
+
+
+
     }
+
 }
