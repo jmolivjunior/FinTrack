@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using FinTrack.API.Models;
 using FinTrack.API.Data;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinTrack.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TransactionController : ControllerBase
     {
         private readonly AppDbContext _context;
