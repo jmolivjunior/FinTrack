@@ -31,12 +31,34 @@ namespace FinTrack.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> Create(Transaction transaction)
         {
-            transaction.Date = DateTime.Now;
-            _context.Transactions.Add(transaction);
+            if (transaction.Installments > 1)
+            {
+                for (int i = 1; i <= transaction.Installments; i++)
+                {
+                    var installment = new Transaction
+                    {
+                        Description = $"{transaction.Description} ({i}/{transaction.Installments})",
+                        Amount = transaction.Amount / transaction.Installments,
+                        Category = transaction.Category,
+                        Type = transaction.Type,
+                        IsFixed = false,
+                        Installments = transaction.Installments,
+                        InstallmentNumber = i,
+                        Date = DateTime.Now.AddMonths(i - 1)
+
+                    };
+                    _context.Transactions.Add(installment);
+                }
+            }
+            else
+            {
+                transaction.Date = DateTime.Now;
+                _context.Transactions.Add(transaction);
+            }
             await _context.SaveChangesAsync();
             return Ok(transaction);
-
         }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
