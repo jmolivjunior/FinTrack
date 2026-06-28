@@ -10,5 +10,7 @@
         public string Category { get; set; } = string.Empty;
 
         public string Type { get; set; } = string.Empty;
+
+        public bool IsFixed { get; set; } = false;
     }
 }
