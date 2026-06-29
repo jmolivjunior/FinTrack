@@ -4,6 +4,7 @@ using FinTrack.API.Models;
 using FinTrack.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace FinTrack.API.Controllers
 {
@@ -24,13 +25,17 @@ namespace FinTrack.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Transaction>>> GetAll()
         {
-            return Ok(await _context.Transactions.ToListAsync());
-
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            return Ok(await _context.Transactions
+                .Where(t => t.UserId == userId)
+                .ToListAsync());
         }
 
         [HttpPost]
         public async Task<ActionResult<Transaction>> Create(Transaction transaction)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
             if (transaction.Installments > 1)
             {
                 for (int i = 1; i <= transaction.Installments; i++)
@@ -44,8 +49,8 @@ namespace FinTrack.API.Controllers
                         IsFixed = false,
                         Installments = transaction.Installments,
                         InstallmentNumber = i,
-                        Date = DateTime.Now.AddMonths(i - 1)
-
+                        Date = DateTime.Now.AddMonths(i - 1),
+                        UserId = userId
                     };
                     _context.Transactions.Add(installment);
                 }
@@ -53,6 +58,7 @@ namespace FinTrack.API.Controllers
             else
             {
                 transaction.Date = DateTime.Now;
+                transaction.UserId = userId;
                 _context.Transactions.Add(transaction);
             }
             await _context.SaveChangesAsync();
