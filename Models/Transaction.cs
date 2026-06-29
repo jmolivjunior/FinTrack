@@ -12,5 +12,7 @@
         public bool IsFixed { get; set; } = false;
         public int Installments { get; set; } = 1;
         public int InstallmentNumber { get; set; } = 1;
+        public DateTime? DueDate { get; set; }
+        public bool IsPaid { get; set; }
     }
 }

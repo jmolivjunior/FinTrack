@@ -16,11 +16,9 @@ namespace FinTrack.API.Controllers
         private readonly AppDbContext _context;
 
         public TransactionController(AppDbContext context)
-
         {
             _context = context;
         }
-
 
         [HttpGet]
         public async Task<ActionResult<List<Transaction>>> GetAll()
@@ -35,7 +33,6 @@ namespace FinTrack.API.Controllers
         public async Task<ActionResult<Transaction>> Create(Transaction transaction)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
             if (transaction.Installments > 1)
             {
                 for (int i = 1; i <= transaction.Installments; i++)
@@ -76,9 +73,15 @@ namespace FinTrack.API.Controllers
             return Ok();
         }
 
-
-
-
+        [HttpPatch("{id}/paid")]
+        public async Task<ActionResult> MarkAsPaid(int id)
+        {
+            var transaction = await _context.Transactions.FindAsync(id);
+            if (transaction == null)
+                return NotFound();
+            transaction.IsPaid = !transaction.IsPaid;
+            await _context.SaveChangesAsync();
+            return Ok(transaction);
+        }
     }
-
 }
