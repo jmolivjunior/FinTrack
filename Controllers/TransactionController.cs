@@ -83,5 +83,22 @@ namespace FinTrack.API.Controllers
             await _context.SaveChangesAsync();
             return Ok(transaction);
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, Transaction updatedTransaction)
+        {
+            var transaction = await _context.Transactions.FindAsync(id);
+            if (transaction == null)
+                return NotFound();
+
+            transaction.Description = updatedTransaction.Description;
+            transaction.Amount = updatedTransaction.Amount;
+            transaction.Category = updatedTransaction.Category;
+            transaction.Type = updatedTransaction.Type;
+            transaction.DueDate = updatedTransaction.DueDate;
+
+            await _context.SaveChangesAsync();
+            return Ok(transaction);
+        }
     }
 }
