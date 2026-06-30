@@ -80,17 +80,10 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 app.UseSwagger();
-
 app.UseSwaggerUI();
-
-app.UseHttpsRedirection();
-
 app.UseCors("AllowReact");
-
+app.UseHttpsRedirection();
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
