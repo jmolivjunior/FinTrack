@@ -11,12 +11,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:3000",
-            "https://fin-track-frontend-one.vercel.app"
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 // Add services to the container.
